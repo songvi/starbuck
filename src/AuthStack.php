@@ -19,7 +19,6 @@ class AuthStack {
     public function localCheckPassword($username, $password){
         foreach($this->stack as $order => $auth) {
             if($auth instanceof LocalAuth){
-                echo $auth->getName();
                 if($auth->checkPassword($username, $password)){
                     // login ok
                     return [true, $auth->getName()];
@@ -28,5 +27,9 @@ class AuthStack {
             }
         }
         return null;
+    }
+
+    public function remoteCheckPassword(){
+
     }
 }
