@@ -11,6 +11,7 @@ use AuthStack\Exceptions\ConfigNotFoundException;
 use AuthStack\Exceptions\ConfigSyntaxException;
 use AuthStack\Logs\LogFile;
 use AuthStack\Logs\LogType;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class ConfigService
@@ -35,6 +36,14 @@ class ConfigService
         } catch (\Exception $e) {
             throw new ConfigSyntaxException($yamlFilePath);
         }
+    }
+
+    public function setAuthStack($config){
+        $this->config["authstack"] = $config;
+    }
+
+    public function setLogger($logger){
+        $this->config["log"] = $logger;
     }
 
     public function getAuthStack()
@@ -72,7 +81,11 @@ class ConfigService
 
     public function  getLogger()
     {
-        $stack = null;
+        if($this->config["log"] instanceof LoggerInterface){
+            return $this->config["log"];
+        }
+
+        // If logger is an array, try to construct to object.
         $logger = $this->config["log"];
             switch (strtolower($logger["type"])) {
                 case LogType::FILE:
