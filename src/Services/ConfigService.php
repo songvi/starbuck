@@ -2,11 +2,15 @@
 
 namespace AuthStack\Services;
 
+use AuthStack\Auths\AuthLdap;
 use AuthStack\Auths\AuthSql;
-use AuthStack\Auths\LocalAuth;
+use AuthStack\Configs\AuthType;
+use AuthStack\Configs\LdapConfig;
 use AuthStack\Configs\MySQLConfig;
-use AuthStack\Exceptions\ConfigNotFoundExeption;
+use AuthStack\Exceptions\ConfigNotFoundException;
 use AuthStack\Exceptions\ConfigSyntaxException;
+use AuthStack\Logs\LogFile;
+use AuthStack\Logs\LogType;
 use Symfony\Component\Yaml\Yaml;
 
 class ConfigService{
@@ -31,28 +35,48 @@ class ConfigService{
     }
 
     public function getAuthStack(){
-        $authStack = [];
+        $stack = [];
         foreach($this->config["authstack"] as $auth){
             switch (strtolower($auth["type"])){
-                case 'sql':
+                case AuthType::SQL:
                     $sqlConfig = new MySQLConfig($auth["config"]);
                     $authSql = new AuthSql($sqlConfig);
-                    $authStack[] = $authSql;
+                    $authSql->setName($auth["name"]);
+                    $stack[] = $authSql;
                     break;
-                case 'ldap':
+                case AuthType::LDAP:
+                    $ldapConfig = new LdapConfig($auth["config"]);
+                    $authLdap = new AuthLdap($ldapConfig);
+                    $authLdap->setName($auth["name"]);
+                    $stack[] = $authLdap;
                     break;
-                case 'oidc':
+                case AuthType::OIDC:
                     break;
-                case 'oauth2':
+                case AuthType::OAUTH2:
                     break;
-                case 'saml':
+                case AuthType::SAML:
                     break;
-                case 'cas':
+                case AuthType::CAS:
                     break;
                 default:
                     break;
             }
         }
-        return $authStack;
+        return $stack;
+    }
+
+    public function  getLogger(){
+        $stack = null;
+        foreach($this->config["log"] as $logger){
+            switch (strtolower($logger["type"])){
+                case LogType::FILE:
+                    return new LogFile($logger["filePath"]);
+                    break;
+                case LogType::SQL:
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

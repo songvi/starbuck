@@ -3,8 +3,7 @@ namespace AuthStack\Logs;
 
 use Psr\Log\AbstractLogger;
 
-class LogSql extends AbstractLogger{
-
+class LogFile extends AbstractLogger{
     public $filePath;
 
     public function __construct($filePath){
@@ -23,10 +22,10 @@ class LogSql extends AbstractLogger{
      */
     public function log($level, $message, array $context = array())
     {
-
+        $this->writeLog($today = date("Ymd H:i:s") ." | ".$level. " | ".$message);
     }
 
-    public function writeLog($str){
+    protected function writeLog($str){
         if(empty($this->filePath)) return;
         file_put_contents($this->filePath, $str, FILE_APPEND);
     }

@@ -2,10 +2,12 @@
 
 namespace AuthStack\Auths;
 
+use AuthStack\Configs\AuthType;
 use AuthStack\Configs\MySQLConfig;
-use AuthStack\Exceptions\AuthStorageException;
-use AuthStack\Exceptions\IdentityNotFoundException;
+use Dibi\Connection;
 use \Dibi;
+use Defuse\Crypto\Key;
+use ParagonIE\PasswordLock\PasswordLock;
 
 class AuthSql extends LocalAuth implements IAuthStorage{
 
@@ -14,6 +16,9 @@ class AuthSql extends LocalAuth implements IAuthStorage{
 
     public function __construct(MySQLConfig $config)
     {
+        $this->setType(AuthType::SQL);
+        $this->setName($config->authName);
+
         $this->config = $config;
         $cfg = [];
         $cfg['host']                = $config->host;
@@ -24,6 +29,7 @@ class AuthSql extends LocalAuth implements IAuthStorage{
         $cfg['table']               = $config->table;
         $cfg['useridcolumn']        = $config->useridcol;
         $cfg['passwordcolumn']      = $config->pwdcol;
+
 
         $this->conn = new Connection($cfg);
         if($config->asciikey) $asciikey = $config->asciikey;
@@ -37,9 +43,8 @@ class AuthSql extends LocalAuth implements IAuthStorage{
             }else{
                 $pass = null;
             }
-            $data = ["uid" => $uid,
-                "password" => $pass,
-                "state" => UserFSM::USER_STATE_INIT
+            $data = ["userid" => $uid,
+                "password" => $pass
             ];
 
             $result = $this->conn->query("INSERT INTO [" . $this->config->table . "] ", $data);
@@ -53,9 +58,8 @@ class AuthSql extends LocalAuth implements IAuthStorage{
 
         if(!$this->isExist($uid)){
             $pass = $this->getHash($passphrase);
-            $data = ["uid" => $uid,
-                "password" => $pass,
-                "state" => UserFSM::USER_STATE_INIT];
+            $data = ["userid" => $uid,
+                "password" => $pass];
             $result = $this->conn->query("INSERT INTO [".$this->config->table."] ", $data);
         }
     }
