@@ -4,6 +4,7 @@ namespace AuthStack\Auths;
 
 use AuthStack\Configs\MySQLConfig;
 use AuthStack\Exceptions\AuthStorageException;
+use AuthStack\Exceptions\IdentityNotFoundException;
 use \Dibi;
 
 class AuthSql extends LocalAuth implements IAuthStorage{
@@ -41,12 +42,7 @@ class AuthSql extends LocalAuth implements IAuthStorage{
                 "state" => UserFSM::USER_STATE_INIT
             ];
 
-            try {
-                $result = $this->conn->query("INSERT INTO [" . $this->config->table . "] ", $data);
-            }
-            catch(\Dibi\Exception $e){
-                throw new \Exception();
-            }
+            $result = $this->conn->query("INSERT INTO [" . $this->config->table . "] ", $data);
             return true;
         }
         return false;
