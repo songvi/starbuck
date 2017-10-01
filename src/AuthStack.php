@@ -18,10 +18,12 @@ class AuthStack {
     }
 
     /**
-     *
+     * @param $username string
+     * @param $password string
+     * @return array|bool
      */
     public function localCheckPassword($username, $password){
-        foreach($this->stack as $order => $auth) {
+        foreach($this->stack as $auth) {
             if($auth instanceof LocalAuth){
                 if($auth->checkPassword($username, $password)){
                     // login ok
@@ -31,7 +33,7 @@ class AuthStack {
                 }
             }
         }
-        $this->logger->notice("[".$auth->getName()."] Check password for user: ". $username." failed" );
+        $this->logger->notice("[AuthStack] Check password for user: ". $username." failed" );
         return null;
     }
 
