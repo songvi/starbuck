@@ -4,6 +4,7 @@ namespace AuthStack\Auths;
 
 use AuthStack\Configs\AuthType;
 use AuthStack\Configs\MySQLConfig;
+use AuthStack\Exceptions\KeyRequireException;
 use Dibi\Connection;
 use \Dibi;
 use Defuse\Crypto\Key;
@@ -35,7 +36,10 @@ class AuthSql extends LocalAuth implements IAuthStorage{
 
 
         $this->conn = new Connection($cfg);
-        if($config->asciikey) $asciikey = $config->asciikey;
+        if(empty($config->asciikey)) {
+            throw new KeyRequireException();
+        }
+        $asciikey = $config->asciikey;
         $this->key = KEY::loadFromAsciiSafeString($asciikey);
     }
 
@@ -65,7 +69,9 @@ class AuthSql extends LocalAuth implements IAuthStorage{
             $data = ["userid " => $uid,
                 "password" => $pass];
             $result = $this->conn->query("INSERT INTO [".$this->config->table."] ", $data);
+            return true;
         }
+        return false;
     }
 
     public function isExist($uid){
@@ -76,6 +82,7 @@ class AuthSql extends LocalAuth implements IAuthStorage{
     public function updatePassword($uid, $password){
         $result = $this->conn->query("UPDATE  [".$this->config->table."]  set  [".$this->config->pwdcol."]  = %s WHERE [uid] = %s", $this->getHash($password), $uid);
         $this->logger->info("[AuthSQL] user : ". $uid. " changed password");
+        return true;
     }
 
     protected function getHash($clearPassPhrase){
@@ -86,13 +93,13 @@ class AuthSql extends LocalAuth implements IAuthStorage{
      *
      */
     public function checkPassword($uid, $passphrase){
-        return $this->_checkPassword($uid, $passphrase, $this->key);
+        return $this->_checkPassword($uid, $passphrase);
     }
 
     /**
      *
      */
-    protected function _checkPassword($uid, $passphrase, Key $key = null){
+    protected function _checkPassword($uid, $passphrase){
         if(!$encryptedPassPhrase = $this->getPassPhrase($uid)) {
             $this->logger->info("[AuthSQL] user: ". $uid. " login failed");
         }
