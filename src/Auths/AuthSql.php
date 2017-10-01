@@ -58,7 +58,7 @@ class AuthSql extends LocalAuth implements IAuthStorage{
 
         if(!$this->isExist($uid)){
             $pass = $this->getHash($passphrase);
-            $data = ["userid" => $uid,
+            $data = ["userid " => $uid,
                 "password" => $pass];
             $result = $this->conn->query("INSERT INTO [".$this->config->table."] ", $data);
         }

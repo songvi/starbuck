@@ -1,25 +1,24 @@
 {
-  "name": "vuba/auth-n",
+  "name": "vuba/authstack",
   "description": "",
   "type": "library",
   "keywords": ["authentication","class","secure"],
   "license": "MIT",
   "require": {
     "php": ">=5.6.0",
-    "paragonie/password_lock": "master-dev",
     "dibi/dibi": "^3.0",
     "phpunit/phpunit": "^6.1",
     "yohang/finite": "~1.1",
     "ramsey/uuid": "^3.0",
     "symfony/event-dispatcher": "^3.0",
-    "doctrine/orm": "2.5.6",
     "symfony/http-foundation": "^3.0",
-    "symfony/ldap": "^2.8",
-    "symfony/yaml": "^3.0"
+    "symfony/yaml": "^3.0",
+    "psr/log": "dev-master",
+    "paragonie/password_lock": "master-dev"
   },
   "autoload": {
     "psr-4": {
-      "Vuba\\AuthN\\": "src"
+      "AuthStack\\": "src"
     }
   }
 }

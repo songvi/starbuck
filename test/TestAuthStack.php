@@ -2,9 +2,11 @@
 
 use PHPUnit\Framework\TestCase;
 use AuthStack\Services\ConfigService;
+use AuthStack\AuthStack;
+
 require '../vendor/autoload.php';
 
-class TestAuthSql extends TestCase
+class TestAuthStack extends TestCase
 {
     public $config;
     public $stack;
@@ -13,16 +15,16 @@ class TestAuthSql extends TestCase
         $filePath = "/var/www/starbuck/test/data/config.yaml";
         $confService = new ConfigService();
         $confService->init($filePath);
-        $this->stack = $confService->getAuthStack()[0];
-        $this->stack->createUser("user02", "P@ssw0rd");
+        $stack = $confService->getAuthStack();
+        $this->stack = new AuthStack($stack);
     }
 
     public function testCheckPassword(){
-        $this->assertTrue($this->stack->checkPassword("user02", "P@ssw0rd"));
-        $this->assertFalse($this->stack->checkPassword("user02", "P@ssw0rjgd"));
+        $result = $this->stack->localCheckPassword("user01", "P@ssw0rd");
+        $this->assertTrue($result[0]);
+        $this->assertNull($this->stack->localCheckPassword("user01", "P@ssw0rjgd"));
     }
 
     public function tearDown(){
-       $this->stack->delete("user02");
     }
 }
