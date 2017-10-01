@@ -3,13 +3,17 @@
 namespace AuthStack\Auths;
 
 use AuthStack\Configs\MySQLConfig;
+use AuthStack\Exceptions\AuthStorageException;
+use \Dibi;
 
 class AuthSql extends LocalAuth implements IAuthStorage{
 
     protected  $key;
+    protected  $config;
 
     public function __construct(MySQLConfig $config)
     {
+        $this->config = $config;
         $cfg = [];
         $cfg['host']                = $config->host;
         $cfg['username']            = $config->username;
@@ -37,7 +41,12 @@ class AuthSql extends LocalAuth implements IAuthStorage{
                 "state" => UserFSM::USER_STATE_INIT
             ];
 
-            $result = $this->conn->query("INSERT INTO [oauth_users_pw] ", $data);
+            try {
+                $result = $this->conn->query("INSERT INTO [" . $this->config->table . "] ", $data);
+            }
+            catch(\Dibi\Exception $e){
+                throw new \Exception();
+            }
             return true;
         }
         return false;
@@ -51,17 +60,17 @@ class AuthSql extends LocalAuth implements IAuthStorage{
             $data = ["uid" => $uid,
                 "password" => $pass,
                 "state" => UserFSM::USER_STATE_INIT];
-            $result = $this->conn->query("INSERT INTO [oauth_users_pw] ", $data);
+            $result = $this->conn->query("INSERT INTO [".$this->config->table."] ", $data);
         }
     }
 
     public function isExist($uid){
-        $result = $this->conn->query("SELECT COUNT(*) from [oauth_users_pw] WHERE [uid] = %s", $uid);
+        $result = $this->conn->query("SELECT COUNT(*) from  ".$this->config->table."  WHERE [".$this->config->useridcol."] = %s", $uid);
         return (intval($result->fetchSingle()) > 0);
     }
 
     public function updatePassword($uid, $password){
-        $result = $this->conn->query("UPDATE [oauth_users_pw] set [password] = %s WHERE [uid] = %s", $this->getHash($password), $uid);
+        $result = $this->conn->query("UPDATE  [".$this->config->table."]  set  [".$this->config->pwdcol."]  = %s WHERE [uid] = %s", $this->getHash($password), $uid);
     }
 
     protected function getHash($clearPassPhrase){
@@ -84,21 +93,21 @@ class AuthSql extends LocalAuth implements IAuthStorage{
     }
 
     public function getPassPhrase($uid){
-        $result = $this->conn->query("SELECT [password] FROM [oauth_users_pw] WHERE [uid] = %s", $uid);
+        $result = $this->conn->query("SELECT [".$this->config->pwdcol."] FROM [".$this->config->table."] WHERE [".$this->config->useridcol."] = %s", $uid);
         $pass = $result->fetchSingle();
         return $pass;
     }
 
     public function delete($uid){
         if($this->isExist($uid)){
-            $result = $this->conn->query("DELETE FROM [oauth_users_pw] WHERE [uid] = %s", $uid);
+            $result = $this->conn->query("DELETE FROM [".$this->config->table."] WHERE [".$this->config->useridcol."] = %s", $uid);
             return $result;
         }
         return false;
     }
 
-    public function listUser($state){
-        $result = $this->conn->query("SELECT [uid] from [oauth_users_pw] WHERE [state] = %s", $state);
+    public function listUser(){
+        $result = $this->conn->query("SELECT [".$this->config->useridcol."] from [".$this->config->table."]");
         return intval($result->fetchSingle());
     }
 }

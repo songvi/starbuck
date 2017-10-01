@@ -10,5 +10,5 @@ interface IAuthStorage {
     public function checkPassword($uid, $passphrase);
     public function getPassPhrase($uid);
     public function delete($uid);
-    public function listUser($state);
+    public function listUser();
 }

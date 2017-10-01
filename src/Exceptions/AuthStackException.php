@@ -2,6 +2,4 @@
 
 namespace AuthStack\Exceptions;
 
-class AuthStackException extends Exception{
-
-}
+class AuthStackException extends Exception{}
