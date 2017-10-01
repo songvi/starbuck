@@ -14,6 +14,7 @@ class TestAuthSql extends TestCase
         $confService = new ConfigService();
         $confService->init($filePath);
         $this->stack = $confService->getAuthStack()[0];
+        $logger = $confService->getLogger();
         $this->stack->createUser("user02", "P@ssw0rd");
     }
 

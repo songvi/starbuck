@@ -16,7 +16,8 @@ class TestAuthStack extends TestCase
         $confService = new ConfigService();
         $confService->init($filePath);
         $stack = $confService->getAuthStack();
-        $this->stack = new AuthStack($stack);
+        $logger = $confService->getLogger();
+        $this->stack = new AuthStack($stack, $logger);
     }
 
     public function testCheckPassword(){

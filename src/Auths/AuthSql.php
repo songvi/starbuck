@@ -8,16 +8,19 @@ use Dibi\Connection;
 use \Dibi;
 use Defuse\Crypto\Key;
 use ParagonIE\PasswordLock\PasswordLock;
+use Psr\Log\LoggerInterface;
 
 class AuthSql extends LocalAuth implements IAuthStorage{
 
     protected  $key;
     protected  $config;
+    protected  $logger;
 
-    public function __construct(MySQLConfig $config)
+    public function __construct(MySQLConfig $config, LoggerInterface $logger)
     {
         $this->setType(AuthType::SQL);
         $this->setName($config->authName);
+        $this->logger = $logger;
 
         $this->config = $config;
         $cfg = [];
@@ -48,6 +51,7 @@ class AuthSql extends LocalAuth implements IAuthStorage{
             ];
 
             $result = $this->conn->query("INSERT INTO [" . $this->config->table . "] ", $data);
+            $this->logger->info("[AuthSQL] create new user: ". $uid);
             return true;
         }
         return false;
@@ -71,6 +75,7 @@ class AuthSql extends LocalAuth implements IAuthStorage{
 
     public function updatePassword($uid, $password){
         $result = $this->conn->query("UPDATE  [".$this->config->table."]  set  [".$this->config->pwdcol."]  = %s WHERE [uid] = %s", $this->getHash($password), $uid);
+        $this->logger->info("[AuthSQL] user : ". $uid. " changed password");
     }
 
     protected function getHash($clearPassPhrase){
@@ -88,8 +93,14 @@ class AuthSql extends LocalAuth implements IAuthStorage{
      *
      */
     protected function _checkPassword($uid, $passphrase, Key $key = null){
-        if(!$encryptedPassPhrase = $this->getPassPhrase($uid)) return false;
-        return PasswordLock::decryptAndVerify($passphrase, $encryptedPassPhrase, $this->key);
+        if(!$encryptedPassPhrase = $this->getPassPhrase($uid)) {
+            $this->logger->info("[AuthSQL] user: ". $uid. " login failed");
+        }
+        if(PasswordLock::decryptAndVerify($passphrase, $encryptedPassPhrase, $this->key)) {
+            $this->logger->info("[AuthSQL] user: " . $uid . " login ok");
+            return true;
+        }
+        return false;
     }
 
     public function getPassPhrase($uid){
@@ -101,6 +112,7 @@ class AuthSql extends LocalAuth implements IAuthStorage{
     public function delete($uid){
         if($this->isExist($uid)){
             $result = $this->conn->query("DELETE FROM [".$this->config->table."] WHERE [".$this->config->useridcol."] = %s", $uid);
+            $this->logger->info("[AuthSQL] delete user : ". $uid. " ok");
             return $result;
         }
         return false;

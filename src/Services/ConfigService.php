@@ -13,8 +13,10 @@ use AuthStack\Logs\LogFile;
 use AuthStack\Logs\LogType;
 use Symfony\Component\Yaml\Yaml;
 
-class ConfigService{
-    protected  $config;
+class ConfigService
+{
+    protected $config;
+
     /**
      * init get the path to file config and return a list of auth config
      * @param $yamlFilePath
@@ -22,8 +24,9 @@ class ConfigService{
      * @throws ConfigNotFoundException
      * @throws ConfigSyntaxException
      */
-    public function init($yamlFilePath){
-        if(!is_file($yamlFilePath)) {
+    public function init($yamlFilePath)
+    {
+        if (!is_file($yamlFilePath)) {
             throw new ConfigNotFoundException();
         };
 
@@ -34,19 +37,21 @@ class ConfigService{
         }
     }
 
-    public function getAuthStack(){
+    public function getAuthStack()
+    {
         $stack = [];
-        foreach($this->config["authstack"] as $auth){
-            switch (strtolower($auth["type"])){
+        $logger = $this->getLogger();
+        foreach ($this->config["authstack"] as $auth) {
+            switch (strtolower($auth["type"])) {
                 case AuthType::SQL:
                     $sqlConfig = new MySQLConfig($auth["config"]);
-                    $authSql = new AuthSql($sqlConfig);
+                    $authSql = new AuthSql($sqlConfig, $logger);
                     $authSql->setName($auth["name"]);
                     $stack[] = $authSql;
                     break;
                 case AuthType::LDAP:
                     $ldapConfig = new LdapConfig($auth["config"]);
-                    $authLdap = new AuthLdap($ldapConfig);
+                    $authLdap = new AuthLdap($ldapConfig, $logger);
                     $authLdap->setName($auth["name"]);
                     $stack[] = $authLdap;
                     break;
@@ -65,10 +70,11 @@ class ConfigService{
         return $stack;
     }
 
-    public function  getLogger(){
+    public function  getLogger()
+    {
         $stack = null;
-        foreach($this->config["log"] as $logger){
-            switch (strtolower($logger["type"])){
+        $logger = $this->config["log"];
+            switch (strtolower($logger["type"])) {
                 case LogType::FILE:
                     return new LogFile($logger["filePath"]);
                     break;
@@ -77,6 +83,5 @@ class ConfigService{
                 default:
                     break;
             }
-        }
     }
 }
