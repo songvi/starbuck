@@ -14,6 +14,9 @@ use AuthStack\Logs\LogType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ *
+ */
 class ConfigService
 {
     protected $config;
@@ -38,10 +41,14 @@ class ConfigService
         }
     }
 
+
     public function setAuthStack($config){
         $this->config["authstack"] = $config;
     }
 
+    /**
+     *
+     */
     public function setLogger($logger){
         $this->config["log"] = $logger;
     }

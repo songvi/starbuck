@@ -4,6 +4,7 @@ namespace AuthStack\Auths;
 
 use AuthStack\Configs\AuthType;
 use AuthStack\Configs\MySQLConfig;
+use AuthStack\Exceptions\IdentityNotFoundException;
 use AuthStack\Exceptions\KeyRequireException;
 use Dibi\Connection;
 use \Dibi;
@@ -102,6 +103,7 @@ class AuthSql extends LocalAuth implements IAuthStorage{
     protected function _checkPassword($uid, $passphrase){
         if(!$encryptedPassPhrase = $this->getPassPhrase($uid)) {
             $this->logger->info("[AuthSQL] user: ". $uid. " login failed");
+            throw new IdentityNotFoundException();
         }
         if(PasswordLock::decryptAndVerify($passphrase, $encryptedPassPhrase, $this->key)) {
             $this->logger->info("[AuthSQL] user: " . $uid . " login ok");
