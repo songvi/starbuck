@@ -10,4 +10,10 @@ class AuthLdap extends LocalAuth{
     public function  __construct(LdapConfig $config, LoggerInterface $logger){
         $this->setType(AuthType::LDAP);
     }
+
+    public function listUser(){}
+
+    public function checkPassword($username, $password){
+        return false;
+    }
 }

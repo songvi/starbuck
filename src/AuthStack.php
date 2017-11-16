@@ -1,6 +1,7 @@
 <?php
 
 namespace AuthStack;
+use AuthStack\Auths\AbstractAuth;
 use AuthStack\Auths\LocalAuth;
 use Psr\Log\LoggerInterface;
 
@@ -23,6 +24,7 @@ class AuthStack {
      * @return array|bool
      */
     public function localCheckPassword($username, $password){
+        $this->sort();
         foreach($this->stack as $auth) {
             if($auth instanceof LocalAuth){
                 if($auth->checkPassword($username, $password)){
@@ -43,6 +45,20 @@ class AuthStack {
 
     public function setStack($stack){
         $this->stack = $stack;
+    }
+
+    public function addAuth(AbstractAuth $auth){
+        $this->stack[] = $auth;
+        $this->sort();
+    }
+
+    protected  function sort(){
+        usort($this->stack, array($this, 'compare'));
+    }
+
+    protected function compare(AbstractAuth $a, AbstractAuth $b){
+        if ($a->getOrder() === $b->getOrder()) return 0;
+        return  ($a->getOrder() > $b->getOrder()) ? 1 : 0;
     }
 
     public function setLogger($logger){

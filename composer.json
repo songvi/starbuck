@@ -8,13 +8,11 @@
     "php": ">=5.6.0",
     "dibi/dibi": "^3.0",
     "phpunit/phpunit": "^6.1",
-    "yohang/finite": "~1.1",
     "ramsey/uuid": "^3.0",
-    "symfony/event-dispatcher": "^3.0",
-    "symfony/http-foundation": "^3.0",
     "symfony/yaml": "^3.0",
     "psr/log": "dev-master",
-    "paragonie/password_lock": "master-dev"
+    "paragonie/password_lock": "master-dev",
+    "adldap2/adldap2": "8.0.4"
   },
   "autoload": {
     "psr-4": {

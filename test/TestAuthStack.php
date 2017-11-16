@@ -23,6 +23,7 @@ class TestAuthStack extends TestCase
     public function testCheckPassword(){
         $result = $this->stack->localCheckPassword("user01", "P@ssw0rd");
         $this->assertTrue($result[0]);
+        $this->assertEquals($result[1], "mysql");
         $this->assertNull($this->stack->localCheckPassword("user01", "P@ssw0rjgd"));
     }
 
