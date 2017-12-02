@@ -30,10 +30,4 @@ class AbstractAuth{
     public function getOrder(){
         return $this->order;
     }
-
-    public function isExist($userId){}
-
-    public function listUser(){}
-
-    public function checkPassword($userId, $password){}
 }

@@ -23,3 +23,60 @@ authstack:
 log:
  type: file
  filePath: /tmp/log.txt
+mapping:
+- name: sqlmapping
+  type: sql
+  authname: mysql
+  map:
+    sub: ""
+    name: ""
+    given_name: ""
+    family_name: ""
+    middle_name: ""
+    nickname: ""
+    preferred_username: ""
+    profile: ""
+    picture: ""
+    email: ""
+    email_verified: ""
+    gender: ""
+    birthdate: ""
+    zoneinfo: ""
+    locale: ""
+    phone_number: ""
+    phone_number_verified: ""
+    address: ""
+    updated_at: ""
+
+    username: ""
+    idp: ""
+    roles: ""
+    groups: ""
+- name: ldapmapping
+  type: ldap
+  authname: ldap
+  map:
+    sub: ""
+    name: ""
+    given_name: ""
+    family_name: ""
+    middle_name: ""
+    nickname: ""
+    preferred_username: ""
+    profile: ""
+    picture: ""
+    email: ""
+    email_verified: ""
+    gender: ""
+    birthdate: ""
+    zoneinfo: ""
+    locale: ""
+    phone_number: ""
+    phone_number_verified: ""
+    address: ""
+    updated_at: ""
+
+    username: ""
+    idp: ""
+    roles: ""
+    groups: ""

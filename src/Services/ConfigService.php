@@ -104,4 +104,8 @@ class ConfigService
                     break;
             }
     }
+
+    public function getMappings(){
+
+    }
 }

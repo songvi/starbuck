@@ -39,6 +39,15 @@ class AuthStack {
         return null;
     }
 
+    public function isExist($username){
+        foreach($this->stack as $auth){
+            if($auth instanceof LocalAuth){
+                if($auth->isExist($username)) return true;
+            }
+        }
+        return false;
+    }
+
     public function remoteCheckPassword(){
 
     }

@@ -88,4 +88,6 @@ class AuthSql extends LocalAuth{
         $result = $this->conn->query("SELECT COUNT(*) from  ".$this->config->table."  WHERE [".$this->config->useridcol."] = %s", $uid);
         return (intval($result->fetchSingle()) > 0);
     }
+
+    public function getUser($userId){}
 }

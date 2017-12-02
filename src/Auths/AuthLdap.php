@@ -16,4 +16,6 @@ class AuthLdap extends LocalAuth{
     public function checkPassword($username, $password){
         return false;
     }
+
+    public function getUser(){}
 }

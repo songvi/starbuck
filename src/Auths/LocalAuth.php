@@ -13,4 +13,15 @@ class LocalAuth extends AbstractAuth{
     public function checkPassword($username, $password){
         return false;
     }
+
+    public function isExist($userId){}
+
+    public function getUser($userId){
+        $user = new AuthStackUser();
+        // Todo get user form source
+        // Todo map to AuthStackUser
+        return $user;
+    }
+
+    public function listUser(){}
 }
